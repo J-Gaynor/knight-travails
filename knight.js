@@ -1,15 +1,36 @@
 // Knight can move +-1, 2 or +-2, 1.
 // Can never go out of bounds (<0, >7)
-// search depth to uncover shortest path
+// search bredth to uncover shortest path
+
+const moveOptions = [[-2, -1], [-2, 1], [-1, -2], [-1, 2], [1, -2], [1, 2], [2, -1], [2, 1]]
 
 const knightMoves = (start, goal) => {
     checkInput(start, goal);
-    const moveOptions = [[-2, -1], [-2, 1], [-1, -2], [-1, 2], [1, -2], [1, 2], [2, -1], [2, 1]]
-    for (const option of moveOptions) {
-        if (checkMove(start, option) !== undefined) {
-            const { nextX, nextY } = checkMove(start, option)
-            if ((nextX === goal[0]) && (nextY === goal[1])) {
-                return option;
+    const queue = [[start]];
+    const visited = new Set();
+    visited.add(`${start[0]}, ${start[1]}`);
+
+    while (queue.length > 0) {
+        const currentPath = queue.shift();
+        const currentPosition = currentPath[currentPath.length - 1];
+
+        if (currentPosition[0] === goal[0] && currentPosition[1] === goal[1]) {
+            console.log(`You made it in ${currentPath.length - 1} moves!  Here's your path:`);
+            currentPath.forEach(pos => console.log(pos));
+            return currentPath;
+        }
+
+        for (const option of moveOptions) {
+            const moveResult = checkMove(currentPosition, option);
+
+            if (moveResult !== undefined) {
+                const { nextX, nextY } = moveResult;
+                const key = `${nextX}, ${nextY}`;
+
+                if (!visited.has(key)) {
+                    visited.add(key);
+                    queue.push([...currentPath, [nextX, nextY]]);
+                }
             }
         }
     }
@@ -39,4 +60,4 @@ const checkMove = (start, move) => {
     return;
 }
 
-console.log(knightMoves([7, 7], [5, 6]));
+knightMoves([0, 0], [5, 6]);
